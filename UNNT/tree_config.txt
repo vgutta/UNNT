@@ -1,0 +1,8 @@
+[config]
+data =''
+target_variable=''
+n_estimators=500
+max_depth=10
+eta=0.1
+subsample=0.5
+colsample_bytree=0.8
