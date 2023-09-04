@@ -1,8 +1,9 @@
 [config]
-data =''
-target_variable=''
+data_file =''
+target_variable='AUC'
 n_estimators=500
 max_depth=10
 eta=0.1
 subsample=0.5
 colsample_bytree=0.8
+

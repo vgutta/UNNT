@@ -1,8 +1,8 @@
-#imports
+import ast
 import argparse
 import configparser
-from create_tree import Tree
-from p1b3.Pilot1.P1B3.cnn import CNN
+from xgb.create_tree import Tree
+from cnn.Pilot1.P1B3.cnn import CNN
 
 
 def main(args):
@@ -11,7 +11,29 @@ def main(args):
     tree_model.train()
     tree_model.evaluate()
 
-    cnn = CNN()
+    cnn = CNN(args)
+
+    print('\n############ FINAL RESULTS #############\n')
+    
+    results = [
+        ['XGBoost', tree_model.rmse, tree_model.r2_error],
+        ['CNN', cnn.rmse, cnn.r2_error]
+    ]
+
+    # Calculate the maximum width for each column
+    col_widths = [max(len(str(item)) + 1 for item in column) for column in zip(*results)]
+
+    # Print the table headers
+    print("Model".ljust(col_widths[0]) + "RMSE".ljust(col_widths[1]) + "R-squared".ljust(col_widths[2]))
+
+    # Print a separator line
+    print("-" * (col_widths[0] + col_widths[1] + col_widths[2]))
+
+    # Print the data
+    for row in results:
+        model, rmse, r2_error = row
+        print(str(model).ljust(col_widths[0]) + str(rmse).ljust(col_widths[1]) + str(r2_error).ljust(col_widths[2]))
+
 
 
 if __name__ == '__main__':
@@ -20,15 +42,13 @@ if __name__ == '__main__':
     config = configparser.ConfigParser()
     config.read('tree_config.txt')
 
-    #code for flags
     parser = argparse.ArgumentParser(description='UNNT - Universal Neural Network Trainer')
-    # default data args
-    parser.add_argument('--data', type=str, default='nci60', help='path to data directory')
-    parser.add_argument('--models', type=str, default='xgb', help='models to train')
     parser.add_argument('--gpu', action='store_true', help='Enable training on GPU')
-    parser.add_argument('--target_variable', type=str, default=config.get('config', 'target_variable'), help='Predictor/Target/Y variable')
+
+    for key, value in config.items('config'):
+        parser.add_argument(f'--{key}', default=ast.literal_eval(value), help=f'{key} (default: {value})')
+
     args = parser.parse_args()
-    print(args)
 
     main(args)
 

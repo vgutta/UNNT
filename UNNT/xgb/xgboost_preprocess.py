@@ -1,14 +1,16 @@
+import os
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 import argparse
 
+DATA_PATH = os.path.join(os.path.dirname(__file__), '../../', 'data')
 
 def load_and_preprocess_default_data():
 
-    lincs1000_genes = pd.read_csv('./data/lincs1000.tsv', sep='\t')
-    nci_exp = pd.read_csv('./data/cell_exp_nci.tsv', sep= '\t')
-    nci_fda_drugs = pd.read_csv('./data/nci_fda_drugs.csv', sep='\t')
+    lincs1000_genes = pd.read_csv(os.path.join(DATA_PATH, 'lincs1000.tsv'), sep='\t')
+    nci_exp = pd.read_csv(os.path.join(DATA_PATH, 'cell_exp_nci.tsv'), sep= '\t')
+    nci_fda_drugs = pd.read_csv(os.path.join(DATA_PATH, 'nci_fda_drugs.csv'), sep='\t')
 
     nci_fda_drugs['NSC'] = nci_fda_drugs['NSC'].astype(str)
 
@@ -24,7 +26,7 @@ def load_and_preprocess_default_data():
 
     nci_exp['CELLNAME'] = nci_exp['CELLNAME'].str.replace('_', '')
 
-    combined_dose_response = pd.read_csv('./data/combined_single_response_agg', sep='\t')
+    combined_dose_response = pd.read_csv(os.path.join(DATA_PATH, 'combined_single_response_agg'), sep='\t')
 
     nci60_dose_response = combined_dose_response[combined_dose_response['SOURCE'] == 'NCI60']
 
@@ -42,15 +44,20 @@ def load_and_preprocess_default_data():
 
     sample_drugs = set(nci_merged_data['DRUG'])
 
-    drug_desc = pd.read_csv('./data/descriptors.2D-NSC.5dose.filtered.txt', sep='\t', engine='c',
+    drug_desc = pd.read_csv(os.path.join(DATA_PATH, 'descriptors.2D-NSC.5dose.filtered.txt'), sep='\t', engine='c',
                         na_values=['na','-',''],
                         converters ={'NAME' : str})
     drug_desc.rename(columns={'NAME': 'NSC'}, inplace=True)
+
+    drug_desc = drug_desc.drop(drug_desc.columns[1000:], axis=1)
 
     subset_drug_desc = drug_desc[drug_desc['NSC'].isin(sample_drugs)]
 
     ## filter drug desc using filtered drug list
     subset_drug_desc.rename(columns={'NSC':'DRUG'}, inplace=True)
+
+    # reduce nci_merged_data rows to only 25% of the original
+    nci_merged_data = nci_merged_data.sample(frac=0.01)
 
     nci_merged_data = nci_merged_data.merge(subset_drug_desc, on='DRUG')
 
@@ -58,9 +65,11 @@ def load_and_preprocess_default_data():
 
     auc_values = all_data['AUC']
 
-    all_data_x = all_data.drop(columns=['CELLNAME', 'SOURCE', 'DRUG', 'AUC', 'IC50'])
+    all_data = all_data.drop(columns=['CELLNAME', 'SOURCE', 'DRUG', 'AUC', 'IC50'])
 
-    x_train, x_test, y_train, y_test = train_test_split(all_data_x, auc_values, test_size=0.3)
+    print(all_data.shape)
+
+    x_train, x_test, y_train, y_test = train_test_split(all_data, auc_values, test_size=0.3)
 
     x_train = x_train.to_numpy()
     x_test = x_test.to_numpy()
@@ -72,7 +81,7 @@ def load_and_preprocess_default_data():
 
 def load_and_preprocess_custom_data(args):
 
-    user_data = pd.read_csv(args.path, sep=',')
+    user_data = pd.read_csv(os.path.join(DATA_PATH, args.data_file), sep=',')
 
     y_values = user_data[args.target_variable]
 
