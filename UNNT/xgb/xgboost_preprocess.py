@@ -13,9 +13,7 @@ def load_and_preprocess_default_data():
     nci_fda_drugs = pd.read_csv(os.path.join(DATA_PATH, 'nci_fda_drugs.csv'), sep='\t')
 
     nci_fda_drugs['NSC'] = nci_fda_drugs['NSC'].astype(str)
-
-    fda_set = None
-
+    
     lincs_index = lincs1000_genes.set_index(['symbol']).index
 
     # filter pandas data frame columns by list and include index column
@@ -26,48 +24,30 @@ def load_and_preprocess_default_data():
 
     nci_exp['CELLNAME'] = nci_exp['CELLNAME'].str.replace('_', '')
 
-    combined_dose_response = pd.read_csv(os.path.join(DATA_PATH, 'combined_single_response_agg'), sep='\t')
+    nci_fda_dose_response = pd.read_csv(os.path.join(DATA_PATH, 'nci_fda_drug_response.tsv'), sep='\t', converters ={'DRUG' : str})
 
-    nci60_dose_response = combined_dose_response[combined_dose_response['SOURCE'] == 'NCI60']
+    nci_merged_data = nci_fda_dose_response.merge(nci_exp, on='CELLNAME')
 
-    nci60_filtered = nci60_dose_response[['SOURCE', 'CELL', 'DRUG', 'AUC', 'IC50']]
-    nci60_filtered.rename(columns={'CELL':'CELLNAME'}, inplace=True)
-    nci60_filtered['DRUG'] = nci60_filtered['DRUG'].str.replace('NSC.', '')
+    #sample_drugs = set(nci_merged_data['DRUG'])
 
-    nci60_filtered['CELLNAME'] = nci60_filtered['CELLNAME'].str.replace('NCI60.', '')
-
-    nci60_filtered['CELLNAME'] = nci60_filtered['CELLNAME'].str.replace('-', '')
-
-    fda_set = nci60_filtered[nci60_filtered['DRUG'].isin(set(nci_fda_drugs['NSC']))]
-
-    nci_merged_data = fda_set.merge(nci_exp, on='CELLNAME')
-
-    sample_drugs = set(nci_merged_data['DRUG'])
-
-    drug_desc = pd.read_csv(os.path.join(DATA_PATH, 'descriptors.2D-NSC.5dose.filtered.txt'), sep='\t', engine='c',
+    drug_desc = pd.read_csv(os.path.join(DATA_PATH, 'fda_drug_desc.tsv'), sep='\t', engine='c',
                         na_values=['na','-',''],
                         converters ={'NAME' : str})
-    drug_desc.rename(columns={'NAME': 'NSC'}, inplace=True)
+    drug_desc.rename(columns={'NAME': 'DRUG'}, inplace=True)
+    drug_desc = drug_desc.dropna()
 
-    drug_desc = drug_desc.drop(drug_desc.columns[1000:], axis=1)
+    #drug_desc = drug_desc.drop(drug_desc.columns[1000:], axis=1)
 
-    subset_drug_desc = drug_desc[drug_desc['NSC'].isin(sample_drugs)]
+    # reduce nci_merged_data rows to only 10% of the original to complete faster
+    nci_merged_data = nci_merged_data.sample(frac=0.1)
 
-    ## filter drug desc using filtered drug list
-    subset_drug_desc.rename(columns={'NSC':'DRUG'}, inplace=True)
-
-    # reduce nci_merged_data rows to only 25% of the original
-    nci_merged_data = nci_merged_data.sample(frac=0.01)
-
-    nci_merged_data = nci_merged_data.merge(subset_drug_desc, on='DRUG')
+    nci_merged_data = nci_merged_data.merge(drug_desc, on='DRUG')
 
     all_data = nci_merged_data
 
     auc_values = all_data['AUC']
 
-    all_data = all_data.drop(columns=['CELLNAME', 'SOURCE', 'DRUG', 'AUC', 'IC50'])
-
-    print(all_data.shape)
+    all_data = all_data.drop(columns=['CELLNAME', 'DRUG', 'AUC'])
 
     x_train, x_test, y_train, y_test = train_test_split(all_data, auc_values, test_size=0.3)
 

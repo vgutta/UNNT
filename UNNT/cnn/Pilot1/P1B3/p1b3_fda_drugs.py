@@ -257,7 +257,7 @@ def load_cellline_expressions():
     Parameters
     ----------
     path: string
-        path to 'RNA_5_Platform_Gene_Transcript_Averaged_intensities.transposed.txt'
+        path to 'cell_exp_nci.tsv'
     dtype: numpy type
         precision (data type) for reading float values
     ncols : int or None
@@ -283,6 +283,8 @@ def load_cellline_expressions():
     
     nci_exp = nci_exp.dropna()
 
+    nci_exp = nci_exp.sample(frac=0.1)
+
     return nci_exp
 
     #return df
@@ -295,7 +297,7 @@ def load_drug_descriptors():
     Parameters
     ----------
     path: string
-        path to 'descriptors.2D-NSC.5dose.filtered.txt'
+        path to 'fda_drug_desc.tsv'
     dtype: numpy type
         precision (data type) for reading float values
     ncols : int or None
@@ -304,7 +306,7 @@ def load_drug_descriptors():
         type of scaling to apply
     """
     
-    drug_desc = pd.read_csv(os.path.join(DATA_PATH, 'descriptors.2D-NSC.5dose.filtered.txt'), sep='\t', engine='c',
+    drug_desc = pd.read_csv(os.path.join(DATA_PATH, 'fda_drug_desc.tsv'), sep='\t', engine='c',
                      na_values=['na','-',''],
                      converters ={'NAME' : str})
     drug_desc.rename(columns={'NAME': 'NSC'}, inplace=True)
@@ -323,7 +325,7 @@ def load_dose_response():
     Parameters
     ----------
     path: string
-        path to 'NCI60_dose_response_with_missing_z5_avg.csv'
+        path to 'nci_fda_drug_response.tsv'
     seed: integer
         seed for random generation
     dtype: numpy type
@@ -335,62 +337,12 @@ def load_dose_response():
     subsample: None, 'naive_balancing' (default None)
         subsampling strategy to use to balance the data based on growth
     """
-    
-    nci_fda_drugs = pd.read_csv(os.path.join(DATA_PATH, 'nci_fda_drugs.csv'),
-                                sep='\t',
-                               dtype={'NSC': object})
-    combined_dose_response = pd.read_csv(os.path.join(DATA_PATH, 'combined_single_response_agg'), sep='\t')
-    nci60_dose_response = combined_dose_response[combined_dose_response['SOURCE'] == 'NCI60']
-    
-    nci60_filtered = nci60_dose_response[['CELL', 'DRUG', 'AUC']]
-    nci60_filtered.rename(columns={'CELL':'CELLNAME'}, inplace=True)
-    nci60_filtered['DRUG'] = nci60_filtered['DRUG'].str.replace('NSC.', '')
 
-    nci60_filtered['CELLNAME'] = nci60_filtered['CELLNAME'].str.replace('NCI60.', '')
-
-    nci60_filtered['CELLNAME'] = nci60_filtered['CELLNAME'].str.replace('-', '')
-    
-    nci_fda_drugs['NSC'] = nci_fda_drugs['NSC'].astype(str)
-    
-    fda_set = nci60_filtered[nci60_filtered['DRUG'].isin(set(nci_fda_drugs['NSC']))]
-    
-    fda_set.rename(columns={'DRUG':'NSC'}, inplace=True)
-    
-    df = fda_set.dropna()
-    
-    print("Filter with FDA list")
-    print(df.head())
-    print(df['AUC'].dtype)
-    
+    df = pd.read_csv(os.path.join(DATA_PATH, 'nci_fda_drug_response.tsv'), sep='\t', converters ={'DRUG' : str})
+    df.rename(columns={'DRUG':'NSC'}, inplace=True)
     df = df.set_index(['NSC'])
 
     return df
-
-"""
-def stage_data():
-#     server = 'http://ftp.mcs.anl.gov/pub/candle/public/benchmarks/P1B3/'
-    server = 'https://modac.cancer.gov/api/v2/dataObject/NCI_DOE_Archive/JDACS4C/JDACS4C_Pilot_1/cancer_drug_response_prediction_dataset/'
-
-    cell_expr_path = candle.fetch_file(server+'P1B3_cellline_expressions.tsv', 'Pilot1', untar=False)
-    # cell_mrna_path = candle.fetch_file(server+'P1B3_cellline_mirna.tsv', 'Pilot1', untar=False)
-    cell_mrna_path = candle.fetch_file(server + 'RNA__microRNA_OSU_V3_chip_log2.transposed.txt', 'Pilot1', untar=False)
-    # cell_prot_path = candle.fetch_file(server+'P1B3_cellline_proteome.tsv', 'Pilot1', untar=False)
-    cell_prot_path = candle.fetch_file(server + 'nci60_proteome_log2.transposed.tsv', 'Pilot1', untar=False)
-    # cell_kino_path = candle.fetch_file(server+'P1B3_cellline_kinome.tsv', 'Pilot1', untar=False)
-    cell_kino_path = candle.fetch_file(server + 'nci60_kinome_log2.transposed.tsv', 'Pilot1', untar=False)
-    # drug_desc_path = candle.fetch_file(server+'P1B3_drug_descriptors.tsv', 'Pilot1', untar=False)
-    drug_desc_path = candle.fetch_file(server + 'descriptors.2D-NSC.5dose.filtered.txt', 'Pilot1', untar=False)
-    # drug_auen_path = candle.fetch_file(server+'P1B3_drug_latent.csv', 'Pilot1', untar=False)
-    drug_auen_path = candle.fetch_file(server + 'Aspuru-Guzik_NSC_latent_representation_292D.csv', 'Pilot1', untar=False)
-    # dose_resp_path = candle.fetch_file(server+'P1B3_dose_response.csv', 'Pilot1', untar=False)
-    dose_resp_path = candle.fetch_file(server + 'NCI60_dose_response_with_missing_z5_avg.csv', 'Pilot1', untar=False)
-    test_cell_path = candle.fetch_file(server+'P1B3_test_celllines.txt', 'Pilot1', untar=False)
-    test_drug_path = candle.fetch_file(server+'P1B3_test_drugs.txt', 'Pilot1', untar=False)
-
-    return(cell_expr_path, cell_mrna_path, cell_prot_path, cell_kino_path,
-           drug_desc_path, drug_auen_path, dose_resp_path, test_cell_path,
-           test_drug_path)
-"""
 
 class DataLoader(object):
     """Load merged drug response, drug descriptors and cell line essay data
