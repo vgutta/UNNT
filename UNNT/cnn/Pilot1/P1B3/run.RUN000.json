@@ -1,0 +1,147 @@
+[
+    {
+        "experiment_id": "EXP000",
+        "run_id": "RUN000",
+        "parameters": [
+            "dense: [1000, 500, 100, 50]",
+            "batch_size: 100",
+            "epochs: 5",
+            "activation: tanh",
+            "loss: mse",
+            "optimizer: sgd",
+            "learning_rate: 0.01",
+            "scaling: std",
+            "dropout: 0.1",
+            "feature_subsample: 500",
+            "val_split: 0.1",
+            "rng_seed: 2017",
+            "initialization: normal",
+            "min_logconc: -5.0",
+            "max_logconc: -4.0",
+            "category_cutoffs: [0.0]",
+            "test_cell_split: 0.15",
+            "cell_features: ['expression']",
+            "drug_features: ['descriptors']",
+            "subsample: naive_balancing",
+            "batch_normalization: False",
+            "cell_noise_sigma: 0.0",
+            "output_dir: /home/2216/UNNT/UNNT/p1b3/Pilot1/P1B3/save/EXP000/RUN000",
+            "verbose: None",
+            "logfile: None",
+            "train_bool: True",
+            "experiment_id: EXP000",
+            "run_id: RUN000",
+            "shuffle: False",
+            "profiling: False",
+            "scramble: False",
+            "workers: 1",
+            "train_steps: 100",
+            "val_steps: 10",
+            "test_steps: 10",
+            "data_type: <class 'numpy.float32'>",
+            "timeout: -1"
+        ],
+        "start_time": "2023-08-30 12:55:17.679985",
+        "status": "Started"
+    },
+    {
+        "run_id": "RUN000",
+        "status": {
+            "set": "Running"
+        },
+        "training_loss": {
+            "set": 0.06341460067778826
+        },
+        "validation_loss": {
+            "set": 0.001130186952650547
+        },
+        "run_progress": {
+            "add": [
+                "epoch: 1/5, duration: 30.353974s, loss: 0.06341460067778826, val_loss: 0.001130186952650547"
+            ]
+        }
+    },
+    {
+        "run_id": "RUN000",
+        "status": {
+            "set": "Running"
+        },
+        "training_loss": {
+            "set": 0.017423463324084877
+        },
+        "validation_loss": {
+            "set": 0.0011374866589903831
+        },
+        "run_progress": {
+            "add": [
+                "epoch: 2/5, duration: 25.144446s, loss: 0.017423463324084877, val_loss: 0.0011374866589903831"
+            ]
+        }
+    },
+    {
+        "run_id": "RUN000",
+        "status": {
+            "set": "Running"
+        },
+        "training_loss": {
+            "set": 0.011628892002627254
+        },
+        "validation_loss": {
+            "set": 8.754844020586461e-05
+        },
+        "run_progress": {
+            "add": [
+                "epoch: 3/5, duration: 26.094427s, loss: 0.011628892002627254, val_loss: 8.754844020586461e-05"
+            ]
+        }
+    },
+    {
+        "run_id": "RUN000",
+        "status": {
+            "set": "Running"
+        },
+        "training_loss": {
+            "set": 0.008408486936241388
+        },
+        "validation_loss": {
+            "set": 0.00013095737085677683
+        },
+        "run_progress": {
+            "add": [
+                "epoch: 4/5, duration: 26.026883s, loss: 0.008408486936241388, val_loss: 0.00013095737085677683"
+            ]
+        }
+    },
+    {
+        "run_id": "RUN000",
+        "status": {
+            "set": "Running"
+        },
+        "training_loss": {
+            "set": 0.006988051952794195
+        },
+        "validation_loss": {
+            "set": 6.305616989266127e-05
+        },
+        "run_progress": {
+            "add": [
+                "epoch: 5/5, duration: 25.919531s, loss: 0.006988051952794195, val_loss: 6.305616989266127e-05"
+            ]
+        }
+    },
+    {
+        "run_id": "RUN000",
+        "runtime_hours": {
+            "set": 0.037122105277777775
+        },
+        "end_time": {
+            "set": "2023-08-30 12:57:31.319564"
+        },
+        "status": {
+            "set": "Finished"
+        },
+        "date_modified": {
+            "set": "NOW"
+        }
+    }
+]
