@@ -1,5 +1,7 @@
  # UNNT (Utility for comparing Neural Networks and Tree-based models)
 
+UNNT enables users with structured (tabular) data to compare CNN and XGBoost models by providing a utility to train both models
+
 ### Installation
 
 UNNT requires [Anaconda](https://docs.anaconda.com/free/anaconda/install/index.html) to run. 
