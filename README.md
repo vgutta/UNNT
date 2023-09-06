@@ -45,7 +45,7 @@ When providing custom data make sure the data is cleaned and preprocessed. The c
 
 ### Configuration
 
-**[tree_config.txt](/UNNT/tree_config.txt)** also contains XGBoost model parameters.
+In addition to configuration on data necessary for the entire software, **[tree_config.txt](/UNNT/tree_config.txt)** also contains XGBoost model parameters.
 
 #### XGBoost parameters
 
@@ -57,8 +57,9 @@ subsample=0.5
 colsample_bytree=0.8
 ```
 
-
 #### CNN parameters
+
+**[cnn_config.txt](/UNNT/cnn_config.txt)** contains the configurations specific for CNN model. Many of these are specific to NCI60 dataset used for demo in this software and thus won't affect the models trained using custom data.
 
 The main parameters for CNN include
 
