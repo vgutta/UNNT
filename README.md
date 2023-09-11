@@ -7,11 +7,17 @@ UNNT enables users with structured (tabular) data to compare CNN and XGBoost mod
 UNNT requires [Anaconda](https://docs.anaconda.com/free/anaconda/install/index.html) to run. 
 
 #### Create conda environment
-```conda env create -f gpu_environment.yml -n UNNT_gpu```
+```bash
+conda env create -f gpu_environment.yml -n UNNT_gpu
+conda activate UNNT_gpu
+```
 
 The CPU version can be installed using the environment.yml file
 
-```conda env create -f environment.yml -n UNNT```
+```bash
+conda env create -f environment.yml -n UNNT
+conda activate UNNT
+```
 
 
 ### Usage  
